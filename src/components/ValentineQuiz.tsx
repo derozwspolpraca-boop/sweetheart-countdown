@@ -57,11 +57,12 @@ const ValentineQuiz = () => {
   };
 
   const q = questions[currentQ];
+  const percentage = Math.round((score / questions.length) * 100);
 
   const getResultEmoji = () => {
-    if (score >= 9) return { emoji: "💯", text: "Idealna para!" };
-    if (score >= 7) return { emoji: "💖", text: "Super razem!" };
-    if (score >= 5) return { emoji: "💕", text: "Całkiem nieźle!" };
+    if (percentage >= 90) return { emoji: "💯", text: "Idealna para!" };
+    if (percentage >= 70) return { emoji: "💖", text: "Super razem!" };
+    if (percentage >= 50) return { emoji: "💕", text: "Całkiem nieźle!" };
     return { emoji: "💗", text: "Poznajcie się lepiej! 😘" };
   };
 
@@ -74,6 +75,16 @@ const ValentineQuiz = () => {
         transition={{ duration: 0.8 }}
         className="text-center max-w-lg mx-auto"
       >
+        <motion.div
+          initial={{ scale: 0 }}
+          whileInView={{ scale: 1 }}
+          viewport={{ once: true }}
+          transition={{ type: "spring", stiffness: 150 }}
+          className="text-5xl mb-3"
+        >
+          🧠
+        </motion.div>
+
         <h2 className="font-display text-4xl md:text-5xl text-foreground mb-2">
           Quiz Miłosny
         </h2>
@@ -89,43 +100,42 @@ const ValentineQuiz = () => {
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -50 }}
               transition={{ duration: 0.3 }}
-              className="bg-card rounded-3xl p-6 shadow-card"
+              className="bg-card rounded-3xl p-5 md:p-6 shadow-card border border-primary/5"
             >
-              {/* Progress */}
-              <div className="flex items-center justify-between mb-4">
-                <span className="text-xs text-muted-foreground font-body">
-                  {currentQ + 1} / {questions.length}
-                </span>
-                <div className="flex gap-1">
-                  {questions.map((_, i) => (
-                    <div
-                      key={i}
-                      className={`w-2 h-2 rounded-full transition-colors duration-300 ${
-                        i < currentQ
-                          ? "bg-primary"
-                          : i === currentQ
-                          ? "bg-accent"
-                          : "bg-secondary"
-                      }`}
-                    />
-                  ))}
+              {/* Progress bar */}
+              <div className="mb-5">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-xs text-muted-foreground font-body font-semibold">
+                    Pytanie {currentQ + 1} z {questions.length}
+                  </span>
+                  <span className="text-xs text-primary font-body font-bold">
+                    {Math.round(((currentQ) / questions.length) * 100)}%
+                  </span>
+                </div>
+                <div className="h-2 rounded-full bg-secondary overflow-hidden">
+                  <motion.div
+                    className="h-full rounded-full gradient-heart"
+                    initial={{ width: `${((currentQ) / questions.length) * 100}%` }}
+                    animate={{ width: `${((currentQ + 1) / questions.length) * 100}%` }}
+                    transition={{ duration: 0.5, ease: "easeOut" }}
+                  />
                 </div>
               </div>
 
-              <h3 className="font-display text-2xl text-foreground mb-6">
+              <h3 className="font-display text-xl md:text-2xl text-foreground mb-6 leading-snug">
                 {q.question}
               </h3>
 
-              <div className="grid gap-3">
+              <div className="grid gap-2.5">
                 {q.answers.map((answer, i) => {
                   let btnStyle = "bg-secondary text-secondary-foreground hover:bg-rose-medium hover:text-primary-foreground";
                   if (showResult && selected !== null) {
                     if (i === q.correct) {
-                      btnStyle = "bg-primary text-primary-foreground scale-105";
+                      btnStyle = "bg-primary text-primary-foreground ring-2 ring-primary/30 scale-[1.02]";
                     } else if (i === selected) {
-                      btnStyle = "bg-destructive text-destructive-foreground";
+                      btnStyle = "bg-destructive text-destructive-foreground ring-2 ring-destructive/30";
                     } else {
-                      btnStyle = "bg-secondary text-muted-foreground opacity-50";
+                      btnStyle = "bg-secondary text-muted-foreground opacity-40";
                     }
                   }
 
@@ -135,12 +145,12 @@ const ValentineQuiz = () => {
                       whileHover={selected === null ? { scale: 1.02 } : {}}
                       whileTap={selected === null ? { scale: 0.98 } : {}}
                       onClick={() => handleAnswer(i)}
-                      className={`w-full p-4 rounded-2xl font-body text-sm text-left transition-all duration-300 flex items-center gap-3 ${btnStyle}`}
+                      className={`w-full p-3.5 rounded-xl font-body text-sm text-left transition-all duration-300 flex items-center gap-3 ${btnStyle}`}
                     >
-                      <span className="w-8 h-8 rounded-full bg-background/30 flex items-center justify-center text-xs font-bold shrink-0">
+                      <span className="w-8 h-8 rounded-lg bg-background/40 flex items-center justify-center text-xs font-bold shrink-0 backdrop-blur-sm">
                         {labels[i]}
                       </span>
-                      {answer}
+                      <span className="leading-snug">{answer}</span>
                     </motion.button>
                   );
                 })}
@@ -152,29 +162,65 @@ const ValentineQuiz = () => {
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ type: "spring", stiffness: 150 }}
-              className="bg-card rounded-3xl p-8 shadow-card"
+              className="bg-card rounded-3xl p-8 shadow-card border border-primary/5"
             >
               <motion.div
-                animate={{ scale: [1, 1.2, 1] }}
-                transition={{ duration: 0.6, repeat: 2 }}
-                className="text-6xl mb-4"
+                animate={{ scale: [1, 1.3, 1] }}
+                transition={{ duration: 0.8, repeat: 2 }}
+                className="text-7xl mb-5"
               >
                 {getResultEmoji().emoji}
               </motion.div>
-              <h3 className="font-display text-3xl text-foreground mb-2">
+
+              <h3 className="font-display text-3xl md:text-4xl text-foreground mb-3">
                 {getResultEmoji().text}
               </h3>
-              <p className="text-primary font-body text-xl font-bold mb-2">
-                {score} / {questions.length}
+
+              {/* Percentage circle */}
+              <motion.div
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ delay: 0.3, type: "spring", stiffness: 120 }}
+                className="relative w-28 h-28 mx-auto mb-4"
+              >
+                <svg viewBox="0 0 100 100" className="w-full h-full -rotate-90">
+                  <circle cx="50" cy="50" r="42" fill="none" stroke="hsl(var(--secondary))" strokeWidth="6" />
+                  <motion.circle
+                    cx="50" cy="50" r="42"
+                    fill="none"
+                    stroke="hsl(var(--primary))"
+                    strokeWidth="6"
+                    strokeLinecap="round"
+                    strokeDasharray={`${2 * Math.PI * 42}`}
+                    initial={{ strokeDashoffset: 2 * Math.PI * 42 }}
+                    animate={{ strokeDashoffset: 2 * Math.PI * 42 * (1 - percentage / 100) }}
+                    transition={{ duration: 1.5, delay: 0.5, ease: "easeOut" }}
+                  />
+                </svg>
+                <div className="absolute inset-0 flex flex-col items-center justify-center">
+                  <motion.span
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.8 }}
+                    className="text-2xl font-bold text-primary font-body"
+                  >
+                    {percentage}%
+                  </motion.span>
+                </div>
+              </motion.div>
+
+              <p className="text-foreground font-body text-base font-semibold mb-1">
+                {score} z {questions.length} poprawnych
               </p>
-              <p className="text-muted-foreground font-body text-sm mb-6">
-                poprawnych odpowiedzi
+              <p className="text-muted-foreground font-body text-xs mb-6">
+                {percentage >= 70 ? "Znacie się świetnie! 🥰" : "Czas na więcej randek! 😘"}
               </p>
+
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={restart}
-                className="gradient-heart text-primary-foreground font-body font-semibold py-3 px-8 rounded-full shadow-romantic"
+                className="gradient-heart text-primary-foreground font-body font-semibold py-3 px-8 rounded-full shadow-romantic text-sm"
               >
                 Zagraj ponownie 💕
               </motion.button>
